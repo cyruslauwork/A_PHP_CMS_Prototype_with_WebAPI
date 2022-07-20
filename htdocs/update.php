@@ -1,39 +1,81 @@
-<?php
-include('db_connection.php');
+<!DOCTYPE HTML>
+<html>
 
-try {
-    // Set the PDO error mode for throwing exceptions
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+<head>
+    <meta charset="utf-8">
+    <title>Update</title>
+</head>
 
-    $title = $_POST['title'];
-    $img_path = $_POST['img_path'];
-    $theme_id = $_POST['theme_id'];
+<body>
 
-    if (isset($_POST["add"])) {
-        // 1. Single insert
-        $sql = "INSERT INTO index_content (title, img_path, theme_id) VALUES ('$title', '$img_path', '$theme_id')";
-        // Using exec() , no results are returned
-        $conn->exec($sql);
+    <?php
+    include('db_connection.php');
 
-        // 2. Multiple insert
-        // Begin
-        // $conn->beginTransaction();
-        // SQL statements
-        // $conn->exec("INSERT INTO MyGuests (firstname, lastname, email) VALUES ('John', 'Doe', 'john@example.com')");
-        // $conn->exec("INSERT INTO MyGuests (firstname, lastname, email) VALUES ('Mary', 'Moe', 'mary@example.com')");
-        // $conn->exec("INSERT INTO MyGuests (firstname, lastname, email) VALUES ('Julie', 'Dooley', 'julie@example.com')");
+    $title = $img_path = $theme_id = "";
 
-        echo "Record inserted successfully<br>";
+    try {
+        // Set the PDO error mode for throwing exceptions
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    } elseif (isset($_POST["delete"])) {
-        // sql to delete a record
-        $stmt = $conn->prepare("DELETE FROM index_content WHERE theme_id=?");
-        $stmt->execute([$theme_id]);
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            if ($_POST['title'] && $_POST['img_path'] && $_POST['theme_id']) {
+                $title = test_input($_POST['title']);
+                $img_path = test_input($_POST['img_path']);
+                $theme_id = test_input($_POST['theme_id']);
+    
+                // 1. Single insert
+                $sql = "INSERT INTO index_content (title, img_path, theme_id) VALUES ('$title', '$img_path', '$theme_id')";
+                // Using exec() , no results are returned
+                $conn->exec($sql);
+    
+                // 2. Multiple insert
+                // Begin
+                // $conn->beginTransaction();
+                // SQL statements
+                // $conn->exec("INSERT INTO MyGuests (firstname, lastname, email) VALUES ('John', 'Doe', 'john@example.com')");
+                // $conn->exec("INSERT INTO MyGuests (firstname, lastname, email) VALUES ('Mary', 'Moe', 'mary@example.com')");
+                // $conn->exec("INSERT INTO MyGuests (firstname, lastname, email) VALUES ('Julie', 'Dooley', 'julie@example.com')");
+    
+                echo "Record inserted successfully<br>";
+            } elseif ($_POST['theme_id']) {
+                $theme_id = test_input($_POST['theme_id']);
+                
+                // sql to delete a record
+                $stmt = $conn->prepare("DELETE FROM index_content WHERE theme_id=?");
+                $stmt->execute([$theme_id]);
 
-        echo "Record deleted successfully";
-        
-    } else die("data insufficient");
-} catch (PDOException $e) {
-    echo $sql . "<br>" . $e->getMessage();
-}
-$conn = null;
+                echo "Record deleted successfully";
+            }
+        }
+    } catch (PDOException $e) {
+        echo $sql . "<br>" . $e->getMessage();
+    }
+
+    function test_input($data) {
+        // $data = trim($data);
+        // $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
+    }
+
+    $conn = null;
+    ?>
+
+    <h2>Add</h2>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        Title: <input type="text" name="title" value="<?php echo $title; ?>">
+        Image Path: <input type="text" name="img_path" value="<?php echo $img_path; ?>">
+        Theme ID: <input type="text" name="theme_id" value="<?php echo $theme_id; ?>">
+        <input type="submit" name="submit" value="Submit"> 
+    </form>
+
+    <hr>
+    <h2>Delete</h2>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        Theme ID: <input type="text" name="theme_id" value="<?php echo $theme_id; ?>">
+        <input type="submit" name="submit" value="Submit"> 
+    </form>
+
+</body>
+
+</html>
