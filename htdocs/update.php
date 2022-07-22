@@ -19,7 +19,7 @@
         // Set the PDO error mode for throwing exceptions
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['administrator'] == "true") {
             if ($_POST['title'] && $_POST['img_path'] && $_POST['theme_id']) {
                 $title = test_input($_POST['title']);
                 $img_path = test_input($_POST['img_path']);
@@ -50,6 +50,8 @@
             } else {
                 echo "A section is missing required value(s)<br>";
             }
+        } else {
+            echo "An administrator's privilege is required<br>";
         }
     } catch (PDOException $e) {
         echo $sql . "<br>" . $e->getMessage();

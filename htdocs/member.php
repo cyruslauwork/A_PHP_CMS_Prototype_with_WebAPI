@@ -13,7 +13,7 @@
     require('db_connection.php');
 
     $username_signin = $password_signin = $username_signup = $password_signup = $admin_signup = "";
-    
+
     try {
         // Set the PDO error mode for throwing exceptions
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -31,8 +31,15 @@
                 if ($user && password_verify($password_signin, $user['pw'])) {
                     echo "Successfully logged in<br>";
 
-                    header("Location: update.php");
-                    exit;
+                    if ($user['administrator'] == "true") {
+                        $_SESSION['administrator'] = "true";
+
+                        header("Location: update.php");
+                        exit;
+                    } else {
+                        header("Location: index.php");
+                        exit;
+                    }
                 } else {
                     echo "Password does not match<br>";
                 }
@@ -80,7 +87,7 @@
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
         Username: <input type="text" name="username_signup">
         Password: <input type="text" name="password_signup">
-        Admin: 
+        Admin:
         <input type="radio" id="admin" name="admin_signup" value="true">
         <label for="admin">True</label><br>
         <input type="radio" id="admin" name="admin_signup" value="false" checked>
