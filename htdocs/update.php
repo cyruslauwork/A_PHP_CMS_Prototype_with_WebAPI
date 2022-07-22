@@ -1,4 +1,4 @@
-<?php session_start(); ?>
+<?php session_start();?>
 
 <!DOCTYPE HTML>
 <html>
@@ -50,8 +50,10 @@
             } else {
                 echo "A section is missing required value(s)<br>";
             }
+        } elseif ($_SESSION['administrator'] == "true") {
+            echo "Administrator privileges granted<br>";
         } else {
-            echo "An administrator's privilege is required<br>";
+            echo "Administrator privileges required<br>";
         }
     } catch (PDOException $e) {
         echo $sql . "<br>" . $e->getMessage();
